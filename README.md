@@ -142,6 +142,24 @@ The repository includes ongoing work around:
 
 ---
 
+## 🔄 End-to-End Workflow
+
+```mermaid
+flowchart TD
+    A[Customer] --> B[Browse Local Stores]
+    B --> C[Explore Products]
+    C --> D[AI Shopping Assistant]
+    D --> E[Intent → Basket]
+    E --> F[Place Order]
+    F --> G[Express / Node API]
+    G --> H[MongoDB]
+    H --> I[Store Owner Dashboard]
+    I --> J[Inventory & Order Management]
+    J --> K[Order Fulfillment]
+```
+
+---
+
 ## 🏗️ Architecture
 
 ```text
