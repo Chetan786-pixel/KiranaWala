@@ -61,6 +61,10 @@ const storeSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  image: {
+    type: String,
+    required: false,
+  },
 });
 
 storeSchema.index({ location: "2dsphere" });

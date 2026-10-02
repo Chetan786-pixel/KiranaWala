@@ -38,6 +38,12 @@ app.use(express.static(path.join(__dirname, "../views")));
 // =====================================================
 
 const connectMongo = async () => {
+  // If already connected (e.g., from devServerWithMemoryDb.js), skip reconnection
+  if (mongoose.connection.readyState === 1) {
+    console.log("Mongoose already connected — skipping reconnection.");
+    return;
+  }
+
   const primaryUri = process.env.MONGO_URI;
   const isProduction = process.env.NODE_ENV === "production";
   const localUri = "mongodb://127.0.0.1:27017/kiranawala";
