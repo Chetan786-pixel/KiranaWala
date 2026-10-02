@@ -8,8 +8,8 @@ export function MembershipBanner() {
     <section aria-label="Memberships Feature" className="w-full py-16 sm:py-24 bg-white border-t border-[#E2E2E7]">
       <div className="kw-container max-w-4xl text-center space-y-6">
         {/* Section Heading & Subhead (Screenshot 5 Match) */}
-        <h2 className="font-display text-[32px] sm:text-[56px] lg:text-[62px] font-black tracking-[-0.035em] text-[#0B051D] leading-tight">
-          Your neighborhood, instantly
+        <h2 className="font-display text-[32px] sm:text-[56px] lg:text-[62px] font-bold tracking-[-0.035em] text-[#0B051D] leading-[0.95]">
+          Your neighbourhood, instantly
         </h2>
 
         <p className="text-base sm:text-lg text-[#504F5F] font-normal max-w-xl mx-auto leading-relaxed">

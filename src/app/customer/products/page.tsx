@@ -22,13 +22,36 @@ import { CartDrawer } from "@/components/shop/CartDrawer";
 import { StoreSelectorModal } from "@/components/shop/StoreSelectorModal";
 import { SearchDrawer } from "@/components/shop/SearchDrawer";
 import { AiShoppingModal } from "@/components/shop/AiShoppingModal";
+import { ProductGridSkeleton } from "@/components/ui/ProductCardSkeleton";
+import { CartFloatingToast } from "@/components/shop/CartFloatingToast";
+import { Button } from "@/components/ui/Button";
+import { useRouter } from "next/navigation";
+import { getStoredAuth, isMerchant, isCustomer, clearStoredAuth } from "@/lib/auth";
 
 export default function CustomerProductsPage() {
+  const router = useRouter();
   const [stores, setStores] = useState<Store[]>([]);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingStores, setLoadingStores] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(false);
+
+  // Role Protection: Merchants cannot enter buyer shopping pages
+  useEffect(() => {
+    const { token, role } = getStoredAuth();
+    if (!token) {
+      router.replace("/customer/login");
+      return;
+    }
+    if (isMerchant(role)) {
+      router.replace("/merchant/dashboard");
+      return;
+    }
+    if (!isCustomer(role)) {
+      router.replace("/customer/login");
+      return;
+    }
+  }, [router]);
 
   // Filter & Search states
   const [activeCategory, setActiveCategory] = useState("all");
@@ -42,6 +65,8 @@ export default function CustomerProductsPage() {
   const [cartStore, setCartStore] = useState<Store | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [recentAddedId, setRecentAddedId] = useState<string | null>(null);
+  const [lastAddedProductName, setLastAddedProductName] = useState<string | null>(null);
+  const [showFloatingToast, setShowFloatingToast] = useState(false);
 
   // Modals & Drawers
   const [selectedProductDetail, setSelectedProductDetail] = useState<Product | null>(null);
@@ -188,7 +213,10 @@ export default function CustomerProductsPage() {
     }
 
     setRecentAddedId(product._id);
+    setLastAddedProductName(product.name);
+    setShowFloatingToast(true);
     setTimeout(() => setRecentAddedId(null), 2000);
+    setTimeout(() => setShowFloatingToast(false), 3500);
 
     // Sync to backend if token present
     const token = localStorage.getItem("token");
@@ -215,6 +243,24 @@ export default function CustomerProductsPage() {
 
   const handleDetailAddToCart = (product: Product, quantity: number) => {
     executeAddToCart(product, quantity);
+  };
+
+  const handleIncrement = (product: Product, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const existing = cartItems.find((item) => item.product._id === product._id);
+    const newQty = (existing ? existing.quantity : 0) + 1;
+    handleUpdateQuantity(product._id, newQty);
+  };
+
+  const handleDecrement = (product: Product, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const existing = cartItems.find((item) => item.product._id === product._id);
+    if (!existing) return;
+    if (existing.quantity <= 1) {
+      handleRemoveItem(product._id);
+    } else {
+      handleUpdateQuantity(product._id, existing.quantity - 1);
+    }
   };
 
   const handleUpdateQuantity = async (productId: string, newQty: number) => {
@@ -403,6 +449,15 @@ export default function CustomerProductsPage() {
   const popularBestsellers = useMemo(() => {
     return products.slice(0, 4);
   }, [products]);
+
+  // Lookup map for fast O(1) quantity check per product card
+  const cartQuantityMap = useMemo(() => {
+    const map = new Map<string, number>();
+    cartItems.forEach((item) => {
+      map.set(item.product._id, item.quantity);
+    });
+    return map;
+  }, [cartItems]);
 
   const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const totalCartAmount = cartItems.reduce(
@@ -600,6 +655,9 @@ export default function CustomerProductsPage() {
                   onAddToCart={handleQuickAddToCart}
                   onOpenDetail={setSelectedProductDetail}
                   isAdded={recentAddedId === product._id}
+                  cartQuantity={cartQuantityMap.get(product._id) || 0}
+                  onIncrement={handleIncrement}
+                  onDecrement={handleDecrement}
                 />
               ))}
             </div>
@@ -665,11 +723,12 @@ export default function CustomerProductsPage() {
           </div>
 
           {loadingProducts ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center space-y-3">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0B051D] border-t-transparent" />
-              <p className="text-sm font-medium text-[#504F5F]">
-                Connecting to {selectedStore?.name || "local kirana"} shelf...
-              </p>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#504F5F]">
+                <div className="h-2 w-2 rounded-full bg-[#059669] animate-pulse" />
+                <span>Loading live stock from {selectedStore?.name || "local kirana"} shelf...</span>
+              </div>
+              <ProductGridSkeleton count={8} />
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center rounded-[28px] border border-[#E8E2D9] bg-[#FAF8F5] p-8 space-y-3">
@@ -702,6 +761,9 @@ export default function CustomerProductsPage() {
                   onAddToCart={handleQuickAddToCart}
                   onOpenDetail={setSelectedProductDetail}
                   isAdded={recentAddedId === product._id}
+                  cartQuantity={cartQuantityMap.get(product._id) || 0}
+                  onIncrement={handleIncrement}
+                  onDecrement={handleDecrement}
                 />
               ))}
             </div>
@@ -709,8 +771,20 @@ export default function CustomerProductsPage() {
         </section>
       </div>
 
-      {/* ─── 6. Floating / Sticky Basket Bar (Appears when items in cart) ─── */}
-      {totalCartCount > 0 && (
+      {/* ─── 8. Affirmative Add-to-Basket Toast ─── */}
+      <CartFloatingToast
+        isVisible={showFloatingToast}
+        productName={lastAddedProductName}
+        itemCount={totalCartCount}
+        totalAmount={totalCartAmount}
+        onViewCart={() => {
+          setShowFloatingToast(false);
+          setIsCartOpen(true);
+        }}
+      />
+
+      {/* ─── 9. Persistent Floating Basket Pill (When items exist and toast hidden) ─── */}
+      {totalCartCount > 0 && !showFloatingToast && (
         <div className="fixed bottom-6 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
           <div
             onClick={() => setIsCartOpen(true)}
@@ -737,7 +811,7 @@ export default function CustomerProductsPage() {
         </div>
       )}
 
-      {/* ─── 7. Drawers & Modals ─── */}
+      {/* ─── 10. Drawers & Modals ─── */}
       {/* Product Detail Experience */}
       <ProductDetailDrawer
         product={selectedProductDetail}
@@ -814,20 +888,22 @@ export default function CustomerProductsPage() {
               Would you like to clear your current basket and switch to <strong>{switchStoreConflict.newStore.name}</strong>?
             </p>
             <div className="pt-2 flex flex-col gap-2">
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="md"
+                className="w-full"
                 onClick={handleConfirmStoreSwitch}
-                className="w-full h-10 rounded-full bg-[#FAD2DE] hover:bg-[#F8BDCE] text-[#0B051D] font-bold text-xs cursor-pointer transition-colors"
               >
                 Clear Basket &amp; Switch Store
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="outline"
+                size="md"
+                className="w-full"
                 onClick={() => setSwitchStoreConflict(null)}
-                className="w-full h-10 rounded-full border border-[#E8E2D9] bg-white text-[#475569] font-bold text-xs hover:bg-[#FAF8F5] cursor-pointer transition-colors"
               >
                 Keep Current Basket
-              </button>
+              </Button>
             </div>
           </div>
         </div>

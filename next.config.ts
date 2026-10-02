@@ -20,7 +20,10 @@ const nextConfig: NextConfig = {
     // BACKEND_URL remains the preferred configuration; this fallback keeps
     // the catalog working if the Vercel variable is missing.
     const backendUrl =
-      process.env.BACKEND_URL || "https://kiranawala-api.onrender.com";
+      process.env.BACKEND_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "https://kiranawala-api.onrender.com"
+        : "http://127.0.0.1:3000");
 
     return [
       {

@@ -3,6 +3,8 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AuthGuard } from "@/components/auth/AuthGuard";
+import { getStoredAuth, clearStoredAuth, isCustomer, isMerchant } from "@/lib/auth";
 import {
   Store,
   Package,
@@ -171,11 +173,20 @@ export default function StoreOwnerDashboardPage() {
 
   // Fetch Store Orders
   const fetchStoreOrders = useCallback(async () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const role = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    const { token, role } = getStoredAuth();
 
-    if (!token || role !== "store-owner") {
-      router.push("/store-owner/login");
+    if (!token) {
+      router.replace("/store-owner/login");
+      return;
+    }
+
+    if (isCustomer(role)) {
+      router.replace("/shop");
+      return;
+    }
+
+    if (!isMerchant(role)) {
+      router.replace("/store-owner/login");
       return;
     }
 
@@ -183,6 +194,12 @@ export default function StoreOwnerDashboardPage() {
       const res = await fetch("/api/store-owner/orders", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (res.status === 401) {
+        clearStoredAuth();
+        router.replace("/store-owner/login");
+        return;
+      }
 
       if (res.ok) {
         const data = await res.json();
@@ -498,10 +515,8 @@ export default function StoreOwnerDashboardPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("storeId");
-    router.push("/");
+    clearStoredAuth();
+    router.replace("/");
   };
 
   // Metrics
@@ -537,7 +552,8 @@ export default function StoreOwnerDashboardPage() {
   }, [products, productSearch, selectedCategory]);
 
   return (
-    <main className="min-h-screen bg-[#FAF8F5] py-8 sm:py-12 text-[#0B051D]">
+    <AuthGuard requiredRole="merchant">
+      <main className="min-h-screen bg-[#FAF8F5] py-8 sm:py-12 text-[#0B051D]">
       <div className="kw-container max-w-7xl space-y-8">
         
         {/* Merchant Header Bar */}
@@ -1479,6 +1495,7 @@ export default function StoreOwnerDashboardPage() {
           </div>
         )}
       </div>
-    </main>
+      </main>
+    </AuthGuard>
   );
 }

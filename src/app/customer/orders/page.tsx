@@ -13,16 +13,27 @@ import {
   AlertCircle,
   Truck,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { getStoredAuth, isMerchant, isCustomer, clearStoredAuth } from "@/lib/auth";
 
 export default function CustomerOrdersPage() {
+  const router = useRouter();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const token = localStorage.getItem("token");
+      const { token, role } = getStoredAuth();
       if (!token) {
-        window.location.href = "/customer/login";
+        router.replace("/customer/login");
+        return;
+      }
+      if (isMerchant(role)) {
+        router.replace("/merchant/dashboard");
+        return;
+      }
+      if (!isCustomer(role)) {
+        router.replace("/customer/login");
         return;
       }
 
@@ -30,6 +41,11 @@ export default function CustomerOrdersPage() {
         const res = await fetch("/api/customer/orders", {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (res.status === 401) {
+          clearStoredAuth();
+          router.replace("/customer/login");
+          return;
+        }
         if (res.ok) {
           const data = await res.json();
           setOrders(Array.isArray(data) ? data : []);
@@ -42,7 +58,7 @@ export default function CustomerOrdersPage() {
     };
 
     fetchOrders();
-  }, []);
+  }, [router]);
 
   return (
     <main className="min-h-screen bg-[#FAF8F5] pt-8 sm:pt-12 pb-24 text-[#0B051D]">

@@ -79,7 +79,7 @@ export function OfferingList() {
     <section aria-label="Explore our offering" className="w-full py-20 sm:py-28 bg-white">
       <div className="kw-container max-w-4xl text-center">
         {/* Section Heading (Screenshot 3 Match) */}
-        <h2 className="font-display text-[32px] sm:text-[56px] lg:text-[64px] font-black tracking-[-0.035em] text-[#0B051D] mb-12 sm:mb-18 leading-tight">
+        <h2 className="font-display text-[32px] sm:text-[56px] lg:text-[64px] font-bold tracking-[-0.035em] text-[#0B051D] mb-12 sm:mb-18 leading-[0.95]">
           Explore our offering
         </h2>
 
@@ -92,7 +92,7 @@ export function OfferingList() {
                 <button
                   type="button"
                   onClick={() => setActiveId(isActive ? "" : item.id)}
-                  className={`font-display text-2xl sm:text-5xl lg:text-[60px] font-black tracking-[-0.035em] transition-all duration-200 cursor-pointer ${
+                  className={`font-display text-2xl sm:text-5xl lg:text-[60px] font-bold tracking-[-0.035em] leading-[0.95] transition-all duration-200 cursor-pointer ${
                     isActive
                       ? "text-[#0B051D] scale-100"
                       : "text-[#96959F] hover:text-[#504F5F]"

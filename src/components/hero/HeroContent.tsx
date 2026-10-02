@@ -28,10 +28,11 @@ export function HeroContent() {
             duration: 0.55,
             ease: [0.16, 1, 0.3, 1],
           }}
-          className="font-display text-[length:var(--kw-text-display)] font-extrabold tracking-[var(--kw-tracking-tightest)] text-[#0F172A] leading-[var(--kw-leading-tight)]"
+          className="font-display text-[length:var(--kw-text-display)] font-bold tracking-[-0.035em] text-[#0B051D] leading-[0.94]"
         >
-          Your neighborhood, <br className="hidden sm:inline" />
-          <span className="text-[#D9531E]">intelligently</span> connected.
+          Everything your <br className="hidden sm:inline" />
+          neighbourhood needs. <br className="hidden sm:inline" />
+          All in one place.
         </motion.h1>
       </div>
 

@@ -126,9 +126,10 @@ export function ShopHeader({
         {/* ─── CENTER HEADLINE & SEARCH CAPSULE ─── */}
         <div className="relative z-10 max-w-3xl w-full text-center space-y-4 sm:space-y-6 px-4">
           {/* Master Original KiranaWala Headline */}
-          <h1 className="font-display text-[36px] sm:text-[52px] lg:text-[64px] font-black tracking-[-0.04em] text-[#0B051D] leading-[1.04]">
-            Everything your neighbourhood needs. <br />
-            <span className="text-[#0B051D]">All in one place.</span>
+          <h1 className="font-display text-[38px] sm:text-[54px] lg:text-[64px] font-bold tracking-[-0.035em] text-[#0B051D] leading-[0.94]">
+            Everything your <br className="hidden sm:inline" />
+            neighbourhood needs. <br />
+            All in one place.
           </h1>
 
           <p className="text-sm sm:text-base text-[#504F5F] font-normal max-w-lg mx-auto leading-relaxed">

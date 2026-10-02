@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+import { getStoredAuth, setStoredAuth, isCustomer, isMerchant } from "@/lib/auth";
+
 export default function CustomerLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -24,6 +26,18 @@ export default function CustomerLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // If already authenticated, redirect immediately
+  useEffect(() => {
+    const { token, role } = getStoredAuth();
+    if (token) {
+      if (isCustomer(role)) {
+        router.replace("/shop");
+      } else if (isMerchant(role)) {
+        router.replace("/merchant/dashboard");
+      }
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,9 +58,13 @@ export default function CustomerLoginPage() {
       }
 
       if (data.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", "customer");
-        router.push("/customer/dashboard");
+        setStoredAuth({
+          token: data.token,
+          role: "customer",
+          username: data.user?.username || email.split("@")[0],
+          email: data.user?.email || email,
+        });
+        window.location.href = "/shop";
       }
     } catch (err: unknown) {
       if (err instanceof Error) {

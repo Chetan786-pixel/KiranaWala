@@ -98,9 +98,9 @@ export default function StoresPage() {
               <span>12+ Hyperlocal Kirana Partners Live</span>
             </div>
 
-            <h1 className="font-display text-[36px] sm:text-[46px] lg:text-[54px] font-black tracking-[-0.04em] text-[#0B051D] leading-[1.04]">
-              Discover Local <br />
-              Kirana Stores
+            <h1 className="font-display text-[38px] sm:text-[48px] lg:text-[58px] font-bold tracking-[-0.035em] text-[#0B051D] leading-[0.94]">
+              Discover local <br />
+              kirana stores.
             </h1>
 
             <p className="text-sm sm:text-base text-[#332E38] font-normal leading-relaxed">

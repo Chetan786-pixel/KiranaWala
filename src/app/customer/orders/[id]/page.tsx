@@ -50,11 +50,15 @@ interface OrderTrackingData {
   }>;
 }
 
+import { useRouter } from "next/navigation";
+import { getStoredAuth, isMerchant, isCustomer, clearStoredAuth } from "@/lib/auth";
+
 export default function OrderTrackingPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const router = useRouter();
   const resolvedParams = use(params);
   const orderId = resolvedParams.id;
 
@@ -64,6 +68,23 @@ export default function OrderTrackingPage({
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
+
+  // Role Protection: Merchants cannot enter buyer order pages
+  useEffect(() => {
+    const { token, role } = getStoredAuth();
+    if (!token) {
+      router.replace("/customer/login");
+      return;
+    }
+    if (isMerchant(role)) {
+      router.replace("/merchant/dashboard");
+      return;
+    }
+    if (!isCustomer(role)) {
+      router.replace("/customer/login");
+      return;
+    }
+  }, [router]);
 
   const fetchTracking = async (isManual = false) => {
     if (isManual) setRefreshing(true);

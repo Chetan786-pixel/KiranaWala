@@ -1,12 +1,12 @@
 "use client";
 
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import CustomerProductsPage from "@/app/customer/products/page";
+import CustomerOrdersPage from "@/app/customer/orders/page";
 
-export default function ShopPage() {
+export default function OrdersPage() {
   return (
     <AuthGuard requiredRole="customer">
-      <CustomerProductsPage />
+      <CustomerOrdersPage />
     </AuthGuard>
   );
 }

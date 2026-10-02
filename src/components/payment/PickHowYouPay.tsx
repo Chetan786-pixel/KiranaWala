@@ -45,7 +45,7 @@ export function PickHowYouPay() {
       <div className="kw-container space-y-12">
         {/* Section Heading & Subtitle (Screenshot 5 Match) */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <h2 className="font-display text-[32px] sm:text-[54px] lg:text-[62px] font-black tracking-[-0.035em] text-[#0B051D] leading-tight">
+          <h2 className="font-display text-[32px] sm:text-[54px] lg:text-[62px] font-bold tracking-[-0.035em] text-[#0B051D] leading-[0.95]">
             Pick how you pay
           </h2>
 

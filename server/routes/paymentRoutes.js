@@ -5,14 +5,14 @@ const router = express.Router();
 const crypto = require("crypto");
 const PaymentService = require("../services/paymentService");
 const Order = require("../models/order");
-const { authenticateToken, requireRole } = require("../middleware/authMiddleware");
+const { authenticateToken, requireRole, requireCustomer } = require("../middleware/authMiddleware");
 
 // =====================================================
 // POST /api/payments/create-order
 // Create Razorpay order for a pending-payment order.
 // NEVER trusts frontend-provided amount.
 // =====================================================
-router.post("/create-order", authenticateToken, async (req, res) => {
+router.post("/create-order", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const { orderId } = req.body;
     const userId = req.user.id || req.user.userId;

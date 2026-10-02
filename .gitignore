@@ -38,3 +38,5 @@ yarn-error.log*
 
 # Scratch & Temporary Tools
 scratch/
+audit_raw_log.txt
+run-full-audit.js

@@ -88,8 +88,8 @@ export function FeatureShowcase() {
       <div className="kw-container">
         {/* Section Header (KiranaWala Neighborhood Connected) */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <h2 className="font-display text-[32px] sm:text-[54px] lg:text-[62px] font-black tracking-[-0.035em] text-[#0B051D] leading-[1.05]">
-            Your neighborhood, connected.
+          <h2 className="font-display text-[32px] sm:text-[54px] lg:text-[62px] font-bold tracking-[-0.035em] text-[#0B051D] leading-[0.95]">
+            Your neighbourhood, connected.
           </h2>
           <p className="text-base sm:text-lg text-[#504F5F] font-normal leading-relaxed max-w-xl mx-auto">
             Discover nearby kirana stores, explore live inventory, build smarter baskets, and shop from the stores around you.
@@ -179,7 +179,7 @@ export function FeatureShowcase() {
                   className="cursor-pointer group transition-all"
                 >
                   <h3
-                    className={`font-display text-2xl sm:text-4xl lg:text-[42px] font-black tracking-[-0.035em] leading-tight transition-colors duration-200 ${
+                    className={`font-display text-2xl sm:text-4xl lg:text-[42px] font-bold tracking-[-0.035em] leading-[0.95] transition-colors duration-200 ${
                       isActive
                         ? "text-[#0B051D]"
                         : "text-[#96959F] group-hover:text-[#504F5F]"

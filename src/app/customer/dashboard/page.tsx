@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { getStoredAuth, clearStoredAuth, isMerchant, isCustomer } from "@/lib/auth";
 import {
   ShoppingBag,
   ArrowRight,
@@ -103,11 +104,20 @@ export default function CustomerDashboardPage() {
   const [username, setUsername] = useState<string>("");
 
   const fetchOrders = useCallback(async (isManual = false) => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const role = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    const { token, role } = getStoredAuth();
 
-    if (!token || role !== "customer") {
-      router.push("/customer/login");
+    if (!token) {
+      router.replace("/customer/login");
+      return;
+    }
+
+    if (isMerchant(role)) {
+      router.replace("/merchant/dashboard");
+      return;
+    }
+
+    if (!isCustomer(role)) {
+      router.replace("/customer/login");
       return;
     }
 
@@ -117,6 +127,12 @@ export default function CustomerDashboardPage() {
       const res = await fetch("/api/customer/orders", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (res.status === 401) {
+        clearStoredAuth();
+        router.replace("/customer/login");
+        return;
+      }
 
       if (!res.ok) {
         throw new Error("Failed to load orders");
@@ -154,11 +170,8 @@ export default function CustomerDashboardPage() {
   }, [fetchOrders]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("username");
-    localStorage.removeItem("userEmail");
-    router.push("/");
+    clearStoredAuth();
+    router.replace("/");
   };
 
   const copyOrderId = (id: string) => {

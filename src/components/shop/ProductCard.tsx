@@ -1,22 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, memo } from "react";
 import Image from "next/image";
 import { Plus, Check, Heart, Star, ShoppingBag, Store as StoreIcon } from "lucide-react";
 import { Product, Store } from "./types";
+import { PriceTag } from "@/components/ui/PriceTag";
+import { QuantityStepper } from "@/components/ui/QuantityStepper";
 
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product, e: React.MouseEvent) => void;
   onOpenDetail: (product: Product) => void;
   isAdded?: boolean;
+  cartQuantity?: number;
+  onIncrement?: (product: Product, e: React.MouseEvent) => void;
+  onDecrement?: (product: Product, e: React.MouseEvent) => void;
 }
 
-export function ProductCard({
+export const ProductCard = memo(function ProductCard({
   product,
   onAddToCart,
   onOpenDetail,
   isAdded = false,
+  cartQuantity = 0,
+  onIncrement,
+  onDecrement,
 }: ProductCardProps) {
   const [isSaved, setIsSaved] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -31,6 +39,8 @@ export function ProductCard({
       ? (product.store as Store).name
       : "Local Kirana";
 
+  const isInStock = product.stock === undefined || product.stock > 0;
+
   return (
     <div
       onClick={() => onOpenDetail(product)}
@@ -40,8 +50,12 @@ export function ProductCard({
       <div className="relative aspect-square w-full overflow-hidden rounded-[16px] bg-[#F8F7FA] flex items-center justify-center p-3">
         {/* Discount / Highlight Tag */}
         {discountPercent && discountPercent > 0 ? (
-          <span className="absolute top-2.5 left-2.5 z-10 rounded-full bg-[#FAD2DE] px-2.5 py-0.5 text-[11px] font-bold tracking-tight text-[#0B051D]">
+          <span className="absolute top-2.5 left-2.5 z-10 rounded-full bg-[#FFA8CD] px-2.5 py-0.5 text-[11px] font-bold tracking-tight text-[#0B051D] tabular-nums">
             -{discountPercent}%
+          </span>
+        ) : !isInStock ? (
+          <span className="absolute top-2.5 left-2.5 z-10 rounded-full bg-red-100 text-red-800 px-2.5 py-0.5 text-[10px] font-bold">
+            Out of Stock
           </span>
         ) : (
           <span className="absolute top-2.5 left-2.5 z-10 rounded-full bg-white/90 border border-[#E8E2D9] px-2.5 py-0.5 text-[10px] font-bold text-[#475569]">
@@ -68,12 +82,17 @@ export function ProductCard({
 
         {/* Product Image */}
         {product.image && !imageError ? (
-          <img
-            src={product.image}
-            alt={product.name}
-            onError={() => setImageError(true)}
-            className="h-full w-full object-contain mix-blend-multiply transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-106"
-          />
+          <div className="relative h-full w-full">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              onError={() => setImageError(true)}
+              className="object-contain mix-blend-multiply transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-106"
+              loading="lazy"
+            />
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center text-[#94A3B8]">
             <ShoppingBag className="h-10 w-10 stroke-[1.2]" />
@@ -87,8 +106,10 @@ export function ProductCard({
         <div className="space-y-1">
           {/* Brand & Weight Metadata */}
           <div className="flex items-center justify-between text-[11px] font-medium text-[#64748B]">
-            <span className="font-semibold text-[#0B051D]">{product.brand || "Kirana Choice"}</span>
-            <span>{product.weight || "Standard"}</span>
+            <span className="font-semibold text-[#0B051D] truncate max-w-[65%]">
+              {product.brand || "Kirana Choice"}
+            </span>
+            <span className="shrink-0">{product.weight || "Standard"}</span>
           </div>
 
           {/* Product Name */}
@@ -110,47 +131,59 @@ export function ProductCard({
           <div className="flex items-center gap-1 text-[11px] text-[#64748B] mb-2 truncate">
             <StoreIcon className="h-3 w-3 text-[#059669] shrink-0" />
             <span className="truncate">{storeName}</span>
-            <span className="text-[#94A3B8]">· 15–20m</span>
+            <span className="text-[#94A3B8] shrink-0">· 15–20m</span>
           </div>
 
-          {/* Pricing Row & Add Button */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-baseline gap-1.5">
-              <span className="font-display text-lg sm:text-xl font-black text-[#0B051D]">
-                ₹{product.price}
-              </span>
-              {product.originalPrice && product.originalPrice > product.price && (
-                <span className="text-xs text-[#94A3B8] line-through">
-                  ₹{product.originalPrice}
-                </span>
-              )}
-            </div>
+          {/* Pricing Row & Add / Stepper Button */}
+          <div className="flex items-center justify-between gap-2">
+            <PriceTag price={product.price} originalPrice={product.originalPrice} size="sm" />
 
-            {/* Quick Add Pill Button */}
-            <button
-              type="button"
-              onClick={(e) => onAddToCart(product, e)}
-              className={`flex h-8 sm:h-9 items-center justify-center gap-1.5 px-3.5 sm:px-4 rounded-full text-xs font-bold transition-all duration-200 active:scale-95 cursor-pointer ${
-                isAdded
-                  ? "bg-[#046234] text-white"
-                  : "bg-[#FAD2DE] text-[#0B051D] hover:bg-[#F8BDCE] hover:shadow-xs"
-              }`}
-            >
-              {isAdded ? (
-                <>
-                  <Check className="h-3.5 w-3.5" />
-                  <span>Added</span>
-                </>
-              ) : (
-                <>
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add</span>
-                </>
-              )}
-            </button>
+            {/* If in cart with quantity > 0, show interactive Stepper */}
+            {cartQuantity > 0 ? (
+              <QuantityStepper
+                quantity={cartQuantity}
+                size="sm"
+                showTrashOnOne={true}
+                onIncrement={(e) => {
+                  e.stopPropagation();
+                  if (onIncrement) onIncrement(product, e);
+                  else onAddToCart(product, e);
+                }}
+                onDecrement={(e) => {
+                  e.stopPropagation();
+                  if (onDecrement) onDecrement(product, e);
+                }}
+              />
+            ) : (
+              <button
+                type="button"
+                disabled={!isInStock}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddToCart(product, e);
+                }}
+                className={`flex h-8 sm:h-9 items-center justify-center gap-1.5 px-3.5 sm:px-4 rounded-full text-xs font-bold transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ${
+                  isAdded
+                    ? "bg-[#046234] text-white"
+                    : "bg-[#FFA8CD] text-[#0B051D] hover:bg-[#FFB8D7] hover:shadow-xs"
+                }`}
+              >
+                {isAdded ? (
+                  <>
+                    <Check className="h-3.5 w-3.5" />
+                    <span>Added</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Add</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-}
+});

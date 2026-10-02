@@ -73,6 +73,24 @@
   font-family: var(--font-serif), "Newsreader", Georgia, "Times New Roman", serif;
 }
 
+/* ─── Klarna-Inspired Bold Display Treatment ─── */
+.klarna-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: var(--leading-display, 0.94);
+  letter-spacing: var(--tracking-display, -0.035em);
+  text-transform: none;
+}
+
+.klarna-display-hero {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.35rem, 5.5vw, 4.5rem);
+  line-height: var(--leading-display, 0.94);
+  letter-spacing: var(--tracking-display, -0.035em);
+  text-transform: none;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

@@ -40,13 +40,12 @@ export function Hero() {
         <div className="relative w-full overflow-hidden rounded-[28px] sm:rounded-[36px] lg:rounded-[42px] border border-[#E2E2E7] bg-[#F8F7FA]">
           <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[420px] lg:min-h-[480px] xl:min-h-[500px]">
             {/* Left Column: Bold Typography & Pink Pill CTA */}
-            <div className="col-span-12 lg:col-span-5 flex flex-col justify-between p-6 sm:p-9 lg:p-10 xl:p-12 z-10">
-              <div className="space-y-4 sm:space-y-5 max-w-lg">
-                <h1 className="font-display text-[34px] sm:text-[48px] lg:text-[56px] xl:text-[64px] font-black tracking-[-0.04em] text-[#0B051D] leading-[0.98]">
-                  Your local <br />
-                  groceries <br />
-                  treated <br />
-                  right
+            <div className="col-span-12 lg:col-span-6 xl:col-span-6 flex flex-col justify-between p-6 sm:p-9 lg:p-10 xl:p-12 z-10">
+              <div className="space-y-4 sm:space-y-5 max-w-xl">
+                <h1 className="font-display text-[32px] sm:text-[44px] lg:text-[48px] xl:text-[54px] font-bold tracking-[-0.035em] text-[#0B051D] leading-[0.94]">
+                  Everything your <br />
+                  neighbourhood needs. <br />
+                  All in one place.
                 </h1>
 
                 <p className="text-sm sm:text-base font-normal leading-relaxed text-[#504F5F] max-w-sm">
@@ -99,7 +98,7 @@ export function Hero() {
             </div>
 
             {/* Right Column: Full-Bleed Media Frame */}
-            <div className="col-span-12 lg:col-span-7 relative w-full overflow-hidden aspect-[16/9] lg:aspect-auto lg:h-full bg-[#F3F3F5]">
+            <div className="col-span-12 lg:col-span-6 xl:col-span-6 relative w-full overflow-hidden aspect-[16/9] lg:aspect-auto lg:h-full bg-[#F3F3F5]">
               <video
                 ref={videoRef}
                 src="/videos/hero-video.mp4"

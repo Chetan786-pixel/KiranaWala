@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Inter, Newsreader } from "next/font/google";
+import { Inter_Tight, Plus_Jakarta_Sans, Inter, Newsreader } from "next/font/google";
 import { Navbar } from "@/components/navigation/Navbar";
 import "./globals.css";
+
+const interTight = Inter_Tight({
+  subsets: ["latin"],
+  variable: "--font-inter-tight",
+  display: "swap",
+  weight: ["600", "700", "800"],
+});
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -43,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${plusJakartaSans.variable} ${inter.variable} ${newsreader.variable}`}>
+    <html lang="en" className={`${interTight.variable} ${plusJakartaSans.variable} ${inter.variable} ${newsreader.variable}`}>
       <body className="min-h-screen bg-white text-[#0B051D] antialiased selection:bg-[#FFA8CD] selection:text-[#0B051D]">
         <Navbar />
         {children}

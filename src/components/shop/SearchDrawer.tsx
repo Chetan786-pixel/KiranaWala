@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, X, Sparkles, ArrowRight, ShoppingBag, Store as StoreIcon, Clock } from "lucide-react";
+import { Search, X, Sparkles, ArrowRight, ShoppingBag, Store as StoreIcon, Clock, Loader2 } from "lucide-react";
 import { Product, Store } from "./types";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface SearchDrawerProps {
   isOpen: boolean;
@@ -62,25 +63,30 @@ export function SearchDrawer({
     };
   }, [isOpen, onClose]);
 
+  const debouncedQuery = useDebounce(query, 200);
+  const isSearching = query.trim() !== debouncedQuery.trim() && query.trim().length > 0;
+
   if (!isOpen) return null;
 
-  const filteredProducts = query.trim()
+  const activeSearchTerm = debouncedQuery.trim().toLowerCase();
+
+  const filteredProducts = activeSearchTerm
     ? products
         .filter(
           (p) =>
-            p.name.toLowerCase().includes(query.toLowerCase()) ||
-            p.category.toLowerCase().includes(query.toLowerCase()) ||
-            (p.brand && p.brand.toLowerCase().includes(query.toLowerCase()))
+            p.name.toLowerCase().includes(activeSearchTerm) ||
+            p.category.toLowerCase().includes(activeSearchTerm) ||
+            (p.brand && p.brand.toLowerCase().includes(activeSearchTerm))
         )
         .slice(0, 8)
     : [];
 
-  const filteredStores = query.trim()
+  const filteredStores = activeSearchTerm
     ? stores
         .filter(
           (s) =>
-            s.name.toLowerCase().includes(query.toLowerCase()) ||
-            s.category.toLowerCase().includes(query.toLowerCase())
+            s.name.toLowerCase().includes(activeSearchTerm) ||
+            s.category.toLowerCase().includes(activeSearchTerm)
         )
         .slice(0, 3)
     : [];

@@ -41,8 +41,9 @@ export default function DiscoverPage() {
           
           {/* Left Text Block */}
           <div className="w-full lg:w-[46%] p-8 sm:p-12 lg:p-14 flex flex-col justify-center space-y-5 sm:space-y-6 z-10">
-            <h1 className="font-display text-[38px] sm:text-[48px] lg:text-[56px] font-black tracking-[-0.04em] text-[#0B051D] leading-[1.04]">
-              What is KiranaWala?
+            <h1 className="font-display text-[38px] sm:text-[50px] lg:text-[60px] font-bold tracking-[-0.035em] text-[#0B051D] leading-[0.94]">
+              What is <br className="hidden sm:inline" />
+              KiranaWala?
             </h1>
 
             <p className="text-sm sm:text-base text-[#332E38] font-normal leading-relaxed">
@@ -479,7 +480,7 @@ export default function DiscoverPage() {
           <span className="text-xs font-bold uppercase tracking-wider text-[#64748B]">
             07 — The Network
           </span>
-          <h2 className="font-display text-[36px] sm:text-[48px] lg:text-[58px] font-black tracking-[-0.04em] text-[#0B051D] leading-[1.04]">
+          <h2 className="font-display text-[36px] sm:text-[48px] lg:text-[58px] font-bold tracking-[-0.035em] text-[#0B051D] leading-[0.95]">
             KiranaWala is available across India
           </h2>
           <p className="text-base sm:text-lg text-[#504F5F] leading-relaxed">

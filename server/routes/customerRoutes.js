@@ -7,7 +7,7 @@ const Store = require("../models/store");
 const Product = require("../models/product");
 const Cart = require("../models/cart");
 const Order = require("../models/order");
-const { authenticateToken } = require("../middleware/authMiddleware");
+const { authenticateToken, requireCustomer } = require("../middleware/authMiddleware");
 const mongoose = require("mongoose");
 const InventoryService = require("../services/inventoryService");
 const CouponService = require("../services/couponService");
@@ -48,12 +48,40 @@ router.post("/login", async (req, res) => {
     }
 
     const secret = process.env.JWT_SECRET || "your_jwt_secret";
-    const token = jwt.sign({ userId: user._id, id: user._id }, secret, {
-      expiresIn: "1h",
+    const token = jwt.sign(
+      { userId: user._id, id: user._id, role: user.role, email: user.email },
+      secret,
+      { expiresIn: "24h" }
+    );
+    res.json({
+      token,
+      role: user.role,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
     });
-    res.json({ token });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/customer/me - Customer session check & profile
+router.get("/me", authenticateToken, requireCustomer, async (req, res) => {
+  try {
+    const userId = req.user.id || req.user.userId;
+    const user = await User.findById(userId).select("username email role phone address city createdAt");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    res.json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -390,7 +418,7 @@ router.get("/products/compare", async (req, res) => {
 // =====================================================
 
 // GET /api/customer/cart
-router.get("/cart", authenticateToken, async (req, res) => {
+router.get("/cart", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     const cart = await Cart.findOne({ user: userId })
@@ -452,7 +480,7 @@ router.get("/cart", authenticateToken, async (req, res) => {
 });
 
 // POST /api/customer/cart/items
-router.post("/cart/items", authenticateToken, async (req, res) => {
+router.post("/cart/items", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     const { productId, quantity } = req.body;
@@ -549,7 +577,7 @@ router.post("/cart/items", authenticateToken, async (req, res) => {
 });
 
 // PATCH /api/customer/cart/items/:productId
-router.patch("/cart/items/:productId", authenticateToken, async (req, res) => {
+router.patch("/cart/items/:productId", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     const { productId } = req.params;
@@ -621,7 +649,7 @@ router.patch("/cart/items/:productId", authenticateToken, async (req, res) => {
 });
 
 // DELETE /api/customer/cart/items/:productId
-router.delete("/cart/items/:productId", authenticateToken, async (req, res) => {
+router.delete("/cart/items/:productId", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     const { productId } = req.params;
@@ -648,7 +676,7 @@ router.delete("/cart/items/:productId", authenticateToken, async (req, res) => {
 });
 
 // DELETE /api/customer/cart
-router.delete("/cart", authenticateToken, async (req, res) => {
+router.delete("/cart", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     let cart = await Cart.findOne({ user: userId });
@@ -664,7 +692,7 @@ router.delete("/cart", authenticateToken, async (req, res) => {
 });
 
 // POST /api/customer/cart/basket - Batch Add Complete Intent Basket
-router.post("/cart/basket", authenticateToken, async (req, res) => {
+router.post("/cart/basket", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     const { storeId, items, clearExisting } = req.body;
@@ -797,7 +825,7 @@ router.post("/cart/basket", authenticateToken, async (req, res) => {
 // =====================================================
 
 // GET /api/customer/cart/smart-optimization - Cart intelligence: free delivery progress & savings tips
-router.get("/cart/smart-optimization", authenticateToken, async (req, res) => {
+router.get("/cart/smart-optimization", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     const cart = await Cart.findOne({ user: userId }).populate("items.product");
@@ -869,7 +897,7 @@ router.get("/cart/smart-optimization", authenticateToken, async (req, res) => {
 });
 
 // POST /api/customer/orders - Production Checkout with Atomic Reservation & Server-side Coupons
-router.post("/orders", authenticateToken, async (req, res) => {
+router.post("/orders", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     const {
@@ -1066,7 +1094,7 @@ router.post("/orders", authenticateToken, async (req, res) => {
 
 
 // GET /api/customer/orders
-router.get("/orders", authenticateToken, async (req, res) => {
+router.get("/orders", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     const orders = await Order.find({ customer: userId })
@@ -1079,7 +1107,7 @@ router.get("/orders", authenticateToken, async (req, res) => {
 });
 
 // GET /api/customer/orders/:orderId
-router.get("/orders/:orderId", authenticateToken, async (req, res) => {
+router.get("/orders/:orderId", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     const { orderId } = req.params;
@@ -1104,7 +1132,7 @@ router.get("/orders/:orderId", authenticateToken, async (req, res) => {
 });
 
 // PATCH /api/customer/orders/:orderId/cancel
-router.patch("/orders/:orderId/cancel", authenticateToken, async (req, res) => {
+router.patch("/orders/:orderId/cancel", authenticateToken, requireCustomer, async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
     const { orderId } = req.params;

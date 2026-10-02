@@ -20,6 +20,9 @@ import {
   Banknote,
 } from "lucide-react";
 import { CartItem, Store } from "./types";
+import { Button } from "@/components/ui/Button";
+import { QuantityStepper } from "@/components/ui/QuantityStepper";
+import { Badge } from "@/components/ui/Badge";
 
 // Razorpay Checkout script loader
 declare global {
@@ -504,9 +507,29 @@ export function CartDrawer({
           </button>
         </div>
 
+        {/* 3-Step Wizard Indicator */}
+        {step !== "success" && step !== "failed" && step !== "processing" && (
+          <div className="flex items-center justify-between border-b border-[#E8E2D9] px-6 py-2.5 bg-[#FAF8F5] text-xs">
+            <div className={`flex items-center gap-1.5 font-bold ${step === "cart" ? "text-[#0B051D]" : "text-[#94A3B8]"}`}>
+              <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${step === "cart" ? "bg-[#0B051D] text-white" : "bg-[#E8E2D9] text-[#64748B]"}`}>1</span>
+              <span>Basket</span>
+            </div>
+            <span className="text-[#CBD5E1]">→</span>
+            <div className={`flex items-center gap-1.5 font-bold ${step === "address" ? "text-[#0B051D]" : "text-[#94A3B8]"}`}>
+              <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${step === "address" ? "bg-[#0B051D] text-white" : "bg-[#E8E2D9] text-[#64748B]"}`}>2</span>
+              <span>Delivery &amp; Payment</span>
+            </div>
+            <span className="text-[#CBD5E1]">→</span>
+            <div className="flex items-center gap-1.5 font-medium text-[#94A3B8]">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] bg-[#E8E2D9] text-[#64748B]">3</span>
+              <span>Done</span>
+            </div>
+          </div>
+        )}
+
         {/* Store Context Badge */}
         {cartStore && cartItems.length > 0 && step === "cart" && (
-          <div className="flex items-center justify-between bg-[#FAF8F5] border-b border-[#E8E2D9] px-6 py-2.5 text-xs">
+          <div className="flex items-center justify-between bg-white border-b border-[#E8E2D9] px-6 py-2.5 text-xs">
             <div className="flex items-center gap-2 truncate text-[#475569]">
               <StoreIcon className="h-3.5 w-3.5 text-[#059669] shrink-0" />
               <span className="font-semibold text-[#0B051D] truncate">{cartStore.name}</span>
@@ -840,24 +863,17 @@ export function CartDrawer({
                 </div>
               </div>
 
-              <button
+              <Button
                 type="submit"
-                disabled={loadingOrder}
-                className="w-full h-12 rounded-full bg-[#FAD2DE] hover:bg-[#F8BDCE] text-[#0B051D] font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer shadow-xs disabled:opacity-50 mt-4"
+                variant="primary"
+                size="lg"
+                isLoading={loadingOrder}
+                className="w-full justify-center mt-4"
               >
-                {loadingOrder ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Processing Order...</span>
-                  </>
-                ) : (
-                  <span>
-                    {paymentMethod === "razorpay"
-                      ? `Pay ₹${total} with Razorpay`
-                      : `Place Order (Cash on Delivery)`}
-                  </span>
-                )}
-              </button>
+                {paymentMethod === "razorpay"
+                  ? `Pay ₹${total} with Razorpay`
+                  : `Place Order (Cash on Delivery)`}
+              </Button>
             </form>
           ) : (
             /* ── ITEMS LIST ── */
@@ -865,7 +881,7 @@ export function CartDrawer({
               {cartItems.map((item) => (
                 <div
                   key={item.product._id}
-                  className="flex items-center justify-between gap-3 rounded-2xl border border-[#E8E2D9] bg-white p-3 shadow-xs"
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-[#E8E2D9] bg-white p-3 shadow-xs hover:border-[#0B051D] transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="h-12 w-12 shrink-0 rounded-xl bg-[#F8F7FA] border border-[#E8E2D9] flex items-center justify-center overflow-hidden p-1">
@@ -884,41 +900,31 @@ export function CartDrawer({
                       <h4 className="font-bold text-xs text-[#0B051D] truncate">
                         {item.product.name}
                       </h4>
-                      <span className="text-[11px] text-[#64748B] block">
+                      <span className="text-[11px] text-[#64748B] block tabular-nums">
                         ₹{item.product.price} each
                       </span>
                     </div>
                   </div>
 
-                  {/* Quantity Adjusters */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="flex h-8 items-center rounded-full border border-[#E8E2D9] bg-[#F8F7FA] px-1.5">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          item.quantity > 1
-                            ? onUpdateQuantity(item.product._id, item.quantity - 1)
-                            : onRemoveItem(item.product._id)
+                  {/* Quantity Stepper & Item Total */}
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <QuantityStepper
+                      quantity={item.quantity}
+                      size="sm"
+                      showTrashOnOne={true}
+                      onIncrement={() =>
+                        onUpdateQuantity(item.product._id, item.quantity + 1)
+                      }
+                      onDecrement={() => {
+                        if (item.quantity <= 1) {
+                          onRemoveItem(item.product._id);
+                        } else {
+                          onUpdateQuantity(item.product._id, item.quantity - 1);
                         }
-                        className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-white text-[#0B051D]"
-                      >
-                        <Minus className="h-3 w-3" />
-                      </button>
-                      <span className="w-6 text-center text-xs font-bold text-[#0B051D]">
-                        {item.quantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          onUpdateQuantity(item.product._id, item.quantity + 1)
-                        }
-                        className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-white text-[#0B051D]"
-                      >
-                        <Plus className="h-3 w-3" />
-                      </button>
-                    </div>
+                      }}
+                    />
 
-                    <span className="w-12 text-right text-xs font-bold text-[#0B051D]">
+                    <span className="w-12 text-right text-xs font-bold text-[#0B051D] tabular-nums">
                       ₹{item.product.price * item.quantity}
                     </span>
                   </div>
@@ -929,7 +935,7 @@ export function CartDrawer({
                 <button
                   type="button"
                   onClick={onClearCart}
-                  className="text-[11px] text-[#94A3B8] hover:text-[#DC2626] transition-colors"
+                  className="text-[11px] font-medium text-[#94A3B8] hover:text-[#DC2626] transition-colors cursor-pointer"
                 >
                   Clear basket
                 </button>
@@ -940,11 +946,11 @@ export function CartDrawer({
 
         {/* Drawer Footer Summary (if on cart step with items) */}
         {step === "cart" && cartItems.length > 0 && (
-          <div className="border-t border-[#E8E2D9] bg-[#FAF8F5] p-6 space-y-4">
+          <div className="border-t border-[#E8E2D9] bg-[#FAF8F5] p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] space-y-4">
             <div className="space-y-1.5 text-xs text-[#504F5F]">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-semibold text-[#0B051D]">₹{subtotal}</span>
+                <span className="font-semibold text-[#0B051D] tabular-nums">₹{subtotal}</span>
               </div>
               <div className="flex justify-between">
                 <span>Delivery (Neighborhood Kirana)</span>
@@ -958,18 +964,19 @@ export function CartDrawer({
               </div>
               <div className="flex justify-between pt-2 border-t border-[#E8E2D9] text-sm font-bold text-[#0B051D]">
                 <span>Total</span>
-                <span>₹{total}</span>
+                <span className="tabular-nums">₹{total}</span>
               </div>
             </div>
 
-            <button
-              type="button"
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full justify-center"
               onClick={() => setStep("address")}
-              className="w-full h-12 rounded-full bg-[#FAD2DE] hover:bg-[#F8BDCE] text-[#0B051D] font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer shadow-xs"
             >
               <span>Proceed to Checkout</span>
               <ArrowRight className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         )}
       </div>

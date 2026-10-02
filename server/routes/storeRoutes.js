@@ -122,14 +122,27 @@ router.post("/login", async (req, res) => {
       return res.status(404).json({ message: "Store not found" });
     }
 
-    // Create token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    // Create token with role and fallback secret
+    const secret = process.env.JWT_SECRET || "your_jwt_secret";
+    const token = jwt.sign(
+      { id: user._id, userId: user._id, role: user.role, email: user.email },
+      secret,
+      { expiresIn: "24h" }
+    );
 
-    res.json({ token, storeId: store._id });
-  } catch {
-    res.status(500).json({ message: "Server error" });
+    res.json({
+      token,
+      role: user.role,
+      storeId: store._id,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
