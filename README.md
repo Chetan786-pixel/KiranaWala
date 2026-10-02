@@ -16,7 +16,7 @@
 </p>
 
 <p>
-  <a href="https://kirana-wala-9mgwqfyxn-jyatin1.vercel.app"><strong>🚀 Live Demo</strong></a>
+  <a href="https://kirana-wala-1nhp.vercel.app"><strong>🚀 Live Demo</strong></a>
 </p>
 
 **Discover stores · Browse products · Shop locally · Order online · Shop smarter with AI**
