@@ -16,12 +16,7 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    // Production frontend fallback: keep the deployed Express API reachable
-    // even if BACKEND_URL was accidentally removed from Vercel environment
-    // variables. BACKEND_URL still takes precedence when explicitly configured.
-    const backendUrl =
-      process.env.BACKEND_URL || "https://kiranawala-api.onrender.com";
-
+    const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3000";
     return [
       {
         source: "/api/:path*",
