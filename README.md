@@ -15,6 +15,10 @@
   <img src="https://img.shields.io/badge/JavaScript-Full%20Stack-F7DF1E?style=flat-square&logo=javascript&logoColor=black">
 </p>
 
+<p>
+  <a href="https://kirana-wala-9mgwqfyxn-jyatin1.vercel.app"><strong>🚀 Live Demo</strong></a>
+</p>
+
 **Discover stores · Browse products · Shop locally · Order online · Shop smarter with AI**
 
 </div>
