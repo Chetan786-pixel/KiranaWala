@@ -100,6 +100,25 @@ The customer and store-owner interfaces were designed as a complete product expe
 
 ---
 
+## Local Store Validation
+
+The completed platform was also validated with **5 local grocery stores** to test the product against realistic store-side workflows and operational scenarios.
+
+Validation included:
+
+- Store onboarding and authentication
+- Store profile and product management
+- Inventory and stock updates
+- Customer product discovery and ordering
+- Order management and fulfilment workflow
+- Checkout/payment flow
+- Store-owner dashboard usability
+- Common operational and edge-case scenarios
+
+This validation was performed alongside the automated test suite and UI/UX QA to ensure the platform was evaluated beyond synthetic development-only scenarios.
+
+---
+
 ## Architecture
 
 ```text
@@ -167,7 +186,7 @@ The customer and store-owner interfaces were designed as a complete product expe
 
 ## Testing & Quality Assurance
 
-KiranaWala was tested beyond the basic happy path. The project has **100+ test cases passing** across backend, commerce and payment workflows, complemented by manual UI/UX verification of the major customer and store-owner journeys.
+KiranaWala was tested beyond the basic happy path. The project has **100+ test cases passing** across backend, commerce and payment workflows, complemented by manual UI/UX verification of the major customer and store-owner journeys and validation with 5 local grocery stores.
 
 ### Automated testing
 
@@ -209,11 +228,15 @@ The deployed application was also manually validated across the major product jo
 - Loading, empty and error states
 - Form validation and interaction states
 
+### Local store validation
+
+The platform was exercised with **5 local grocery stores**, providing real-world validation of the store-owner and customer workflows, including onboarding, catalog management, inventory updates, ordering, fulfilment and checkout.
+
 ### Production-readiness verification
 
 The project includes a production-readiness QA report covering the deployed application, backend, database persistence, payment sandbox flow, authorization, cart/stock behaviour and build verification.
 
-**Result: 100+ automated test cases passed, with professional UI/UX QA performed across the primary application flows.**
+**Result: 100+ automated test cases passed, professional UI/UX QA completed, and the core platform workflows validated with 5 local grocery stores.**
 
 > Test counts refer to the project's automated test cases and QA validation performed during the completed build. They are not a claim of 100% code coverage.
 
@@ -332,6 +355,7 @@ docker compose up --build
 - MongoDB-backed commerce state
 - **100+ automated test cases passed**
 - Professional UI/UX QA across primary user journeys
+- **Validated with 5 local grocery stores**
 - Dedicated payment and commerce test suites
 - Dockerized development
 - GitHub Actions CI
