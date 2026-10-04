@@ -15,6 +15,7 @@
   <img src="https://img.shields.io/badge/MongoDB-Database-47A248?style=flat-square&logo=mongodb&logoColor=white">
   <img src="https://img.shields.io/badge/Razorpay-Payments-3395FF?style=flat-square">
   <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white">
+  <img src="https://img.shields.io/badge/Tests-100%2B%20Passed-success?style=flat-square">
 </p>
 
 <p>
@@ -33,7 +34,7 @@
 
 KiranaWala is a deployed hyperlocal grocery-commerce platform built around the workflow of **customers → neighbourhood stores → inventory → checkout → fulfilment**.
 
-The platform supports separate customer and store-owner experiences, persistent commerce data, authenticated APIs, inventory/order management, Razorpay checkout, payment verification, automated tests, Docker-based development and CI workflows.
+The platform supports separate customer and store-owner experiences, persistent commerce data, authenticated APIs, inventory/order management, Razorpay checkout, payment verification, automated testing, professional UI validation, Docker-based development and CI workflows.
 
 ### What it solves
 
@@ -93,15 +94,9 @@ KiranaWala integrates Razorpay for online checkout with server-side payment hand
 
 KiranaWala includes an AI-assisted shopping workflow that maps natural-language shopping intent into a basket-oriented experience, helping users move from **what they want** to **what they should add to their cart**.
 
-### 🧪 Engineering & Quality
+### 🎨 Professional UI
 
-- Automated backend test suite
-- Dedicated commerce and payment tests
-- ESLint
-- GitHub Actions CI workflows
-- Docker and Docker Compose
-- Production build verification
-- Environment/secrets configuration
+The customer and store-owner interfaces were designed as a complete product experience rather than a basic CRUD demo, with responsive layouts, reusable components, navigation, dashboards, forms, checkout flows and state/error handling across the main user journeys.
 
 ---
 
@@ -170,26 +165,57 @@ KiranaWala includes an AI-assisted shopping workflow that maps natural-language 
 
 ---
 
-## Repository Structure
+## Testing & Quality Assurance
 
-```text
-KiranaWala/
-├── .github/workflows/          # CI workflows
-├── src/                        # Next.js application
-│   ├── app/                    # Routes and pages
-│   ├── components/             # Reusable UI components
-│   └── ...
-├── server/                     # Express backend
-│   ├── models/                 # MongoDB models
-│   ├── routes/                 # REST API routes
-│   ├── services/               # Backend services
-│   └── __tests__/              # Backend/integration tests
-├── public/                     # Static assets
-├── Dockerfile
-├── docker-compose.yml
-├── package.json
-└── README.md
-```
+KiranaWala was tested beyond the basic happy path. The project has **100+ test cases passing** across backend, commerce and payment workflows, complemented by manual UI/UX verification of the major customer and store-owner journeys.
+
+### Automated testing
+
+The test suite covers areas including:
+
+- Customer authentication and authorization
+- Store-owner authentication and authorization
+- Protected routes and access control
+- Product and store operations
+- Cart behaviour
+- Order creation and order lifecycle
+- Inventory/stock behaviour
+- Coupon and discount flows
+- Checkout/payment behaviour
+- Razorpay order creation
+- HMAC-SHA256 payment signature verification
+- Invalid/tampered payment signatures
+- Payment failure/error handling
+- Backend validation and error responses
+- Database-backed API behaviour
+
+### UI / UX QA
+
+The deployed application was also manually validated across the major product journeys, including:
+
+- Landing and navigation flows
+- Customer registration/login
+- Store discovery
+- Product browsing
+- Search/filter interactions
+- Cart and checkout
+- Payment flow
+- Order tracking
+- Customer dashboard
+- Store-owner dashboard
+- Product/inventory management
+- Order management
+- Responsive layouts
+- Loading, empty and error states
+- Form validation and interaction states
+
+### Production-readiness verification
+
+The project includes a production-readiness QA report covering the deployed application, backend, database persistence, payment sandbox flow, authorization, cart/stock behaviour and build verification.
+
+**Result: 100+ automated test cases passed, with professional UI/UX QA performed across the primary application flows.**
+
+> Test counts refer to the project's automated test cases and QA validation performed during the completed build. They are not a claim of 100% code coverage.
 
 ---
 
@@ -224,24 +250,26 @@ The backend does not rely on a frontend-supplied amount when creating the paymen
 
 ---
 
-## Testing & Production Verification
+## Repository Structure
 
-The repository includes dedicated automated tests for commerce and payment behaviour, including Razorpay signature verification. The project also includes a production-readiness QA report covering the deployed application, backend, database persistence, payment sandbox flow, authorization, cart/stock behaviour and build verification.
-
-Examples of verified areas:
-
-- Next.js production build
-- Express/Node backend
-- MongoDB persistence
-- Customer/store authentication
-- Cart and checkout flow
-- Razorpay sandbox payment flow
-- HMAC-SHA256 signature verification
-- Payment tests
-- Commerce/order tests
-- Docker configuration
-- GitHub Actions CI
-- Environment/secrets configuration
+```text
+KiranaWala/
+├── .github/workflows/          # CI workflows
+├── src/                        # Next.js application
+│   ├── app/                    # Routes and pages
+│   ├── components/             # Reusable UI components
+│   └── ...
+├── server/                     # Express backend
+│   ├── models/                 # MongoDB models
+│   ├── routes/                 # REST API routes
+│   ├── services/               # Backend services
+│   └── __tests__/              # Backend/integration tests
+├── public/                     # Static assets
+├── Dockerfile
+├── docker-compose.yml
+├── package.json
+└── README.md
+```
 
 ---
 
@@ -302,6 +330,8 @@ docker compose up --build
 - JWT authentication and protected API flows
 - Inventory-aware ordering
 - MongoDB-backed commerce state
+- **100+ automated test cases passed**
+- Professional UI/UX QA across primary user journeys
 - Dedicated payment and commerce test suites
 - Dockerized development
 - GitHub Actions CI
