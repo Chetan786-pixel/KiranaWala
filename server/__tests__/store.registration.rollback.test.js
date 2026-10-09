@@ -24,13 +24,13 @@ describe("Store Owner Registration Transaction", () => {
       },
       instanceOpts: [
         {
-          dbName: "kiranawala_registration_test",
+          dbName: "kiranawala_registration_TEST",
         },
       ],
     });
 
     await mongoose.connect(replSet.getUri(), {
-      dbName: "kiranawala_registration_test",
+      dbName: "kiranawala_registration_TEST",
     });
   });
 
